@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary: #4F46E5;
+    --secondary: #10B981;
+    --accent: #F59E0B;
+    --danger: #EF4444;
+  }
+
+  * {
+    @apply border-slate-200 dark:border-slate-800;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 font-sans antialiased;
+    min-height: 100vh;
+  }
+
+  .dark body {
+    @apply bg-slate-900 text-slate-100;
+  }
+}
+
+@layer components {
+  /* Glass Card */
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-glass rounded-2xl;
+  }
+
+  .dark .glass-card {
+    @apply bg-slate-800/80 border-slate-700/50 shadow-glass-dark;
+  }
+
+  /* Primary Button */
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-semibold px-6 py-3 rounded-xl
+           transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    @apply bg-white hover:bg-slate-50 text-primary-600 font-semibold px-6 py-3 rounded-xl
+           border-2 border-primary-200 hover:border-primary-300
+           transition-all duration-200 hover:-translate-y-0.5
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Input Field */
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-white
+           focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500
+           placeholder:text-slate-400 text-slate-900 transition-all duration-200;
+  }
+
+  .dark .input-field {
+    @apply bg-slate-800 border-slate-600 text-slate-100 placeholder:text-slate-500;
+  }
+
+  /* Stat Card */
+  .stat-card {
+    @apply glass-card p-5 flex flex-col gap-2 hover:shadow-card-hover hover:-translate-y-1
+           transition-all duration-300 cursor-default;
+  }
+
+  /* Verdict Card - Success */
+  .verdict-success {
+    @apply bg-gradient-to-br from-secondary-50 to-secondary-100 border-2 border-secondary-200 rounded-2xl p-6;
+  }
+
+  /* Verdict Card - Danger */
+  .verdict-danger {
+    @apply bg-gradient-to-br from-danger-50 to-red-100 border-2 border-danger-200 rounded-2xl p-6;
+  }
+
+  /* Skeleton Loader */
+  .skeleton {
+    @apply bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 animate-shimmer rounded-lg;
+    background-size: 200% 100%;
+  }
+
+  .dark .skeleton {
+    @apply from-slate-700 via-slate-600 to-slate-700;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full;
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    @apply bg-slate-800;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    @apply bg-slate-600;
+  }
+}
+
+/* Page transition overlay */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}

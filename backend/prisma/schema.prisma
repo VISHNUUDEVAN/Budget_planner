@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum LifestyleType {
+  student
+  family
+  working_professional
+  bachelor
+  business_owner
+  freelancer
+  job_seeker
+  retired
+}
+
+enum TransactionType {
+  income
+  expense
+}
+
+enum GoalType {
+  vacation
+  purchase
+  emergency
+  custom
+}
+
+enum GoalStatus {
+  active
+  completed
+  paused
+}
+
+enum NotificationType {
+  warning
+  success
+  info
+}
+
+model User {
+  id               String           @id @default(cuid())
+  fullName         String
+  email            String           @unique
+  mobileNumber     String?
+  passwordHash     String
+  address          String?
+  city             String?
+  occupation       String?
+  age              Int?
+  lifestyleType    LifestyleType?
+  otpHash          String?
+  otpExpiresAt     DateTime?
+  refreshToken     String?          @db.VarChar(512)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  financialProfile FinancialProfile?
+  transactions     Transaction[]
+  loans            Loan[]
+  goals            Goal[]
+  notifications    Notification[]
+}
+
+model FinancialProfile {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  monthlyIncome       Float    @default(0)
+  monthlyExpenses     Float    @default(0)
+  currentSavings      Float    @default(0)
+  existingLoansEMI    Float    @default(0)
+  monthlySavingsGoal  Float    @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id        String          @id @default(cuid())
+  userId    String
+  category  String
+  amount    Float
+  type      TransactionType
+  date      DateTime        @default(now())
+  note      String?
+  createdAt DateTime        @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Loan {
+  id                    String   @id @default(cuid())
+  userId                String
+  loanName              String
+  principal             Float
+  emiAmount             Float
+  remainingTenureMonths Int
+  interestRate          Float
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Goal {
+  id            String     @id @default(cuid())
+  userId        String
+  goalType      GoalType
+  targetAmount  Float
+  currentAmount Float      @default(0)
+  targetDate    DateTime?
+  status        GoalStatus @default(active)
+  description   String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  message   String
+  type      NotificationType
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,213 @@
+openapi: 3.0.3
+info:
+  title: Smart Financial Decision Assistant API
+  description: Backend services and decision engines for personal finance management.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001/api
+    description: Local Dev Server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: INVALID_CREDENTIALS
+            message:
+              type: string
+              example: Invalid email or password
+
+security:
+  - BearerAuth: []
+
+paths:
+  /auth/signup:
+    post:
+      summary: User registration
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [fullName, email, password]
+              properties:
+                fullName:
+                  type: string
+                email:
+                  type: string
+                mobileNumber:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Created
+        '409':
+          description: Email Exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      summary: User login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Success
+
+  /auth/forgot-password:
+    post:
+      summary: Request password OTP
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Success
+
+  /auth/verify-otp:
+    post:
+      summary: Verify password OTP
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, otp]
+              properties:
+                email:
+                  type: string
+                otp:
+                  type: string
+      responses:
+        '200':
+          description: Success
+
+  /auth/reset-password:
+    post:
+      summary: Reset password with OTP
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, otp, newPassword]
+              properties:
+                email:
+                  type: string
+                otp:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        '200':
+          description: Success
+
+  /auth/refresh-token:
+    post:
+      summary: Refresh access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Success
+
+  /profile:
+    get:
+      summary: Get personal profile details
+    put:
+      summary: Update personal profile details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+
+  /profile/financial-details:
+    get:
+      summary: Get financial profile details
+    put:
+      summary: Update financial profile details
+
+  /dashboard/summary:
+    get:
+      summary: Aggregate dashboard summary
+
+  /dashboard/health-score:
+    get:
+      summary: Get health score breakdown
+
+  /planner/vacation:
+    post:
+      summary: Calculate vacation costs & budget feasibility
+
+  /planner/purchase:
+    post:
+      summary: Evaluate affordability of a purchase
+
+  /planner/emergency-fund:
+    post:
+      summary: Evaluate safety of emergency fund withdrawal
+
+  /planner/savings-analysis:
+    get:
+      summary: Get compound projections and suggestions
+
+  /notifications:
+    get:
+      summary: Get user notifications
+  /notifications/{id}/read:
+    patch:
+      summary: Mark notification as read
