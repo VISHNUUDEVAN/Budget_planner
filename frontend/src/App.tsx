@@ -27,6 +27,9 @@ import { SavingsAnalysis } from './pages/planner/SavingsAnalysis';
 import { HealthReport } from './pages/health/HealthReport';
 import { NotificationCenter } from './pages/notifications/NotificationCenter';
 import { Profile } from './pages/profile/Profile';
+import { Settings } from './pages/settings/Settings';
+import { Analytics } from './pages/analytics/Analytics';
+import { FinancialScore } from './pages/health/FinancialScore';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -153,6 +156,36 @@ function App() {
                   <ProtectedRoute>
                     <MainLayout>
                       <Profile />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <Settings />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/analytics"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <Analytics />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/financial-score"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <FinancialScore />
                     </MainLayout>
                   </ProtectedRoute>
                 }

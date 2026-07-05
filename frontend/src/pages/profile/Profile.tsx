@@ -9,7 +9,7 @@ import { Select } from '../../components/Select';
 import { Button } from '../../components/Button';
 import { GlassCard } from '../../components/GlassCard';
 import { Skeleton } from '../../components/Skeleton';
-import { User, Wallet, Settings, LogOut, Sun, Moon } from 'lucide-react';
+import { User, Wallet, Settings, LogOut, Sun, Moon, Camera, KeyRound } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 type ProfileTab = 'personal' | 'financial' | 'settings';
@@ -45,6 +45,21 @@ export function Profile() {
       setSaveSuccess('Personal details updated successfully!');
       setTimeout(() => setSaveSuccess(null), 3000);
     },
+    onError: (err: any) => {
+      alert(err.response?.data?.error?.message || 'Failed to update personal details.');
+    }
+  });
+
+  const changePasswordMutation = useMutation({
+    mutationFn: profileApi.changePassword,
+    onSuccess: () => {
+      setSaveSuccess('Password updated successfully!');
+      passwordForm.reset();
+      setTimeout(() => setSaveSuccess(null), 3000);
+    },
+    onError: (err: any) => {
+      alert(err.response?.data?.error?.message || 'Failed to change password.');
+    }
   });
 
   const updateFinancialMutation = useMutation({
@@ -60,6 +75,7 @@ export function Profile() {
   const personalForm = useForm({
     values: {
       fullName: userProfile?.fullName || '',
+      email: userProfile?.email || '',
       mobileNumber: userProfile?.mobileNumber || '',
       address: userProfile?.address || '',
       city: userProfile?.city || '',
@@ -67,6 +83,13 @@ export function Profile() {
       age: userProfile?.age || 25,
       lifestyleType: userProfile?.lifestyleType || 'working_professional',
     },
+  });
+
+  const passwordForm = useForm({
+    defaultValues: {
+      currentPassword: '',
+      newPassword: '',
+    }
   });
 
   const financialForm = useForm({
@@ -81,6 +104,10 @@ export function Profile() {
 
   const onSavePersonal = (values: any) => {
     updateProfileMutation.mutate(values);
+  };
+
+  const onSavePassword = (values: any) => {
+    changePasswordMutation.mutate(values);
   };
 
   const onSaveFinancial = (values: any) => {
@@ -180,65 +207,152 @@ export function Profile() {
         {/* Tab content area */}
         <div className="lg:col-span-3">
           {activeTab === 'personal' && (
-            <GlassCard className="p-6">
-              <h2 className="text-lg font-heading font-extrabold text-slate-800 dark:text-white mb-4">
-                Personal details
-              </h2>
-              <form onSubmit={personalForm.handleSubmit(onSavePersonal)} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Input
-                    {...personalForm.register('fullName', { required: 'Name is required' })}
-                    id="fullName"
-                    label="Full Name"
-                    error={personalForm.formState.errors.fullName?.message}
-                  />
-                  <Input
-                    {...personalForm.register('mobileNumber')}
-                    id="mobileNumber"
-                    label="Mobile Number"
-                  />
-                  <Input
-                    {...personalForm.register('age', { valueAsNumber: true })}
-                    id="age"
-                    type="number"
-                    label="Age"
-                  />
-                  <Input
-                    {...personalForm.register('occupation')}
-                    id="occupation"
-                    label="Occupation"
-                  />
-                  <div className="sm:col-span-2">
-                    <Select
-                      {...personalForm.register('lifestyleType')}
-                      id="lifestyleType"
-                      label="Lifestyle Stage Profile"
-                      options={lifestyleOptions}
-                    />
+            <div className="space-y-6 animate-fade">
+              {/* Profile details card */}
+              <GlassCard className="p-6">
+                <div className="flex flex-col sm:flex-row items-center gap-5 pb-6 border-b border-slate-100 dark:border-slate-800/80 mb-6">
+                  {/* Photo upload container */}
+                  <div className="relative group cursor-pointer">
+                    {userProfile?.profilePhoto ? (
+                      <img
+                        src={userProfile.profilePhoto}
+                        alt="Profile Avatar"
+                        className="w-20 h-20 rounded-full object-cover border-2 border-primary-500 shadow-md group-hover:opacity-75 transition-opacity"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-primary-500/10 dark:bg-primary-500/20 flex items-center justify-center font-bold text-primary-500 text-3xl group-hover:opacity-75 transition-opacity">
+                        {userProfile?.fullName?.[0]?.toUpperCase() || 'U'}
+                      </div>
+                    )}
+                    <label className="absolute inset-0 flex items-center justify-center bg-black/40 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                      <Camera className="w-5 h-5" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              updateProfileMutation.mutate({ profilePhoto: reader.result as string });
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
                   </div>
-                  <div className="sm:col-span-2">
-                    <Input
-                      {...personalForm.register('address')}
-                      id="address"
-                      label="Street Address"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <Input
-                      {...personalForm.register('city')}
-                      id="city"
-                      label="City / Region"
-                    />
+                  <div>
+                    <h3 className="font-heading font-extrabold text-slate-800 dark:text-white text-md">
+                      Profile Picture
+                    </h3>
+                    <p className="text-xxs text-slate-400 font-semibold mt-1">
+                      Accepts PNG, JPG or WEBP image files. Recommended resolution: 200x200px.
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800/80">
-                  <Button type="submit" isLoading={updateProfileMutation.isPending}>
-                    Save Personal Changes
-                  </Button>
+                <form onSubmit={personalForm.handleSubmit(onSavePersonal)} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Input
+                      {...personalForm.register('fullName', { required: 'Name is required' })}
+                      id="fullName"
+                      label="Full Name"
+                      error={personalForm.formState.errors.fullName?.message}
+                    />
+                    <Input
+                      {...personalForm.register('email', { required: 'Email is required' })}
+                      id="email"
+                      type="email"
+                      label="Email Address"
+                      error={personalForm.formState.errors.email?.message}
+                    />
+                    <Input
+                      {...personalForm.register('mobileNumber')}
+                      id="mobileNumber"
+                      label="Mobile Number"
+                    />
+                    <Input
+                      {...personalForm.register('age', { valueAsNumber: true })}
+                      id="age"
+                      type="number"
+                      label="Age"
+                    />
+                    <Input
+                      {...personalForm.register('occupation')}
+                      id="occupation"
+                      label="Occupation"
+                    />
+                    <div className="sm:col-span-2">
+                      <Select
+                        {...personalForm.register('lifestyleType')}
+                        id="lifestyleType"
+                        label="Lifestyle Stage Profile"
+                        options={lifestyleOptions}
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <Input
+                        {...personalForm.register('address')}
+                        id="address"
+                        label="Street Address"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <Input
+                        {...personalForm.register('city')}
+                        id="city"
+                        label="City / Region"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800/80">
+                    <Button type="submit" isLoading={updateProfileMutation.isPending}>
+                      Save Personal Changes
+                    </Button>
+                  </div>
+                </form>
+              </GlassCard>
+
+              {/* Change Password Card */}
+              <GlassCard className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <KeyRound className="w-5 h-5 text-primary-500" />
+                  <h2 className="text-lg font-heading font-extrabold text-slate-800 dark:text-white">
+                    Change Password
+                  </h2>
                 </div>
-              </form>
-            </GlassCard>
+                <form onSubmit={passwordForm.handleSubmit(onSavePassword)} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Input
+                      {...passwordForm.register('currentPassword', { required: 'Current password is required' })}
+                      id="currentPassword"
+                      type="password"
+                      label="Current Password"
+                      error={passwordForm.formState.errors.currentPassword?.message}
+                    />
+                    <Input
+                      {...passwordForm.register('newPassword', {
+                        required: 'New password is required',
+                        minLength: { value: 8, message: 'Password must be at least 8 characters' }
+                      })}
+                      id="newPassword"
+                      type="password"
+                      label="New Password"
+                      error={passwordForm.formState.errors.newPassword?.message}
+                    />
+                  </div>
+
+                  <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800/80">
+                    <Button type="submit" isLoading={changePasswordMutation.isPending}>
+                      Update Password
+                    </Button>
+                  </div>
+                </form>
+              </GlassCard>
+            </div>
           )}
 
           {activeTab === 'financial' && (

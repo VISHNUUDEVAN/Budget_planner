@@ -18,8 +18,11 @@ import {
   Moon,
   Menu,
   X,
+  Settings,
+  Target
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AIChatbotWidget } from './AIChatbotWidget';
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
@@ -37,14 +40,17 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
   });
 
   const menuItems = [
-    { label: 'Dashboard', path: '/', icon: LayoutDashboard },
+    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'Analytics', path: '/analytics', icon: TrendingUp },
     { label: 'Vacation Planner', path: '/planner/vacation', icon: Calendar },
     { label: 'Purchase Planner', path: '/planner/purchase', icon: ShoppingBag },
     { label: 'Emergency Fund', path: '/planner/emergency-fund', icon: ShieldAlert },
     { label: 'Savings Analysis', path: '/planner/savings-analysis', icon: TrendingUp },
     { label: 'Financial Health', path: '/health-report', icon: HeartPulse },
     { label: 'Notifications', path: '/notifications', icon: Bell, badge: notifData?.unreadCount },
-    { label: 'Profile Settings', path: '/profile', icon: UserIcon },
+    { label: 'Profile', path: '/profile', icon: UserIcon },
+    { label: 'Settings', path: '/settings', icon: Settings },
+    { label: 'Financial Score', path: '/financial-score', icon: Target },
   ];
 
   const handleLogout = () => {
@@ -210,6 +216,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl w-full mx-auto">
           {children}
         </main>
+        <AIChatbotWidget />
       </div>
     </div>
   );

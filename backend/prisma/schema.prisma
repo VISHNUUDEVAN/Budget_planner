@@ -56,6 +56,8 @@ model User {
   occupation       String?
   age              Int?
   lifestyleType    LifestyleType?
+  profilePhoto     String?          @db.LongText
+  chatState        String?          @db.Text
   otpHash          String?
   otpExpiresAt     DateTime?
   refreshToken     String?          @db.VarChar(512)
@@ -67,6 +69,7 @@ model User {
   loans            Loan[]
   goals            Goal[]
   notifications    Notification[]
+  chatMessages     ChatMessage[]
 }
 
 model FinancialProfile {
@@ -132,6 +135,16 @@ model Notification {
   type      NotificationType
   read      Boolean          @default(false)
   createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  sender    String
+  text      String   @db.Text
+  createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
 import { plannerApi } from '../../api/plannerApi';
+import { dashboardApi } from '../../api/dashboardApi';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { GlassCard } from '../../components/GlassCard';
 import { VerdictCard } from '../../components/VerdictCard';
+import { AIRecommendationWidget } from '../../components/AIRecommendationWidget';
 import type { EmergencyFundResult } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -19,6 +22,12 @@ type FundFormValues = z.infer<typeof fundSchema>;
 export function EmergencyFundPlanner() {
   const [result, setResult] = useState<EmergencyFundResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const { data: dashboardData } = useQuery({
+    queryKey: ['dashboardSummary'],
+    queryFn: dashboardApi.getSummary,
+  });
+  const currentSavings = dashboardData?.summary?.currentSavings || 0;
 
   const {
     register,
@@ -54,22 +63,25 @@ export function EmergencyFundPlanner() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Form Input panel */}
-        <GlassCard className="p-6 h-fit">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <Input
-              {...register('requestedAmount')}
-              id="requestedAmount"
-              type="number"
-              label="Withdrawal Amount Request (₹)"
-              placeholder="e.g. 25000"
-              error={errors.requestedAmount?.message}
-            />
+        <div className="space-y-6">
+          <GlassCard className="p-6 h-fit">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <Input
+                {...register('requestedAmount')}
+                id="requestedAmount"
+                type="number"
+                label="Withdrawal Amount Request (₹)"
+                placeholder="e.g. 25000"
+                error={errors.requestedAmount?.message}
+              />
 
-            <Button type="submit" isLoading={isLoading} fullWidth className="py-3.5 mt-2">
-              Assess Safety Margin
-            </Button>
-          </form>
-        </GlassCard>
+              <Button type="submit" isLoading={isLoading} fullWidth className="py-3.5 mt-2">
+                Assess Safety Margin
+              </Button>
+            </form>
+          </GlassCard>
+          {dashboardData && <AIRecommendationWidget savings={currentSavings} />}
+        </div>
 
         {/* Results Panel */}
         <div className="lg:col-span-2">

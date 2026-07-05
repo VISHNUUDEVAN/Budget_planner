@@ -9,6 +9,7 @@ import profileRouter from './routes/profile';
 import dashboardRouter from './routes/dashboard';
 import plannerRouter from './routes/planner';
 import notificationsRouter from './routes/notifications';
+import chatbotRouter from './routes/chatbot';
 import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
@@ -48,6 +49,7 @@ app.use('/api/profile', profileRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/planner', plannerRouter);
 app.use('/api/notifications', notificationsRouter);
+app.use('/api/chatbot', chatbotRouter);
 
 // ─── 404 Handler ─────────────────────────────────────────────
 app.use((_req, res) => {

@@ -3,10 +3,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { plannerApi } from '../../api/plannerApi';
+import { dashboardApi } from '../../api/dashboardApi';
+import { useQuery } from '@tanstack/react-query';
 import { Input } from '../../components/Input';
 import { WizardShell } from '../../components/WizardShell';
 import { GlassCard } from '../../components/GlassCard';
 import { VerdictCard } from '../../components/VerdictCard';
+import { AIRecommendationWidget } from '../../components/AIRecommendationWidget';
 import type { VacationPlanResult } from '../../types';
 import { Plane, Train, Bus, ShieldAlert, BadgeInfo } from 'lucide-react';
 
@@ -24,6 +27,12 @@ export function VacationPlanner() {
   const [result, setResult] = useState<VacationPlanResult | null>(null);
   const [step, setStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+
+  const { data: dashboardData } = useQuery({
+    queryKey: ['dashboardSummary'],
+    queryFn: dashboardApi.getSummary,
+  });
+  const currentSavings = dashboardData?.summary?.currentSavings || 0;
 
   const {
     register,
@@ -268,6 +277,12 @@ export function VacationPlanner() {
               ))}
             </div>
           </div>
+
+          {dashboardData && (
+            <div className="mt-6">
+              <AIRecommendationWidget savings={currentSavings} />
+            </div>
+          )}
 
           {/* Reset Action */}
           <div className="flex justify-end pt-4">

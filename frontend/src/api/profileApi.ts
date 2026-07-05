@@ -21,4 +21,8 @@ export const profileApi = {
     const res = await api.put<{ success: true; data: { financialProfile: FinancialProfile } }>('/profile/financial-details', data);
     return res.data.data.financialProfile;
   },
+
+  changePassword: async (data: any): Promise<void> => {
+    await api.put('/profile/change-password', data);
+  },
 };
