@@ -1,3 +1,4 @@
+http://localhost:5173/dashboard
 # Smart Finance 🚀
 ### Modern Personal Expense Tracker & Lifestyle Decision Planner
 
